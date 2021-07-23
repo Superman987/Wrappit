@@ -109,7 +109,7 @@ public class WikiPacketReader {
 					int packetId = Integer.parseInt(string, 16);
 
 					try {
-						@SuppressWarnings("deprecation") // Hopefully this isn't an issue
+						// Hopefully this isn't an issue
 						PacketType type = PacketType.findCurrent(protocol, sender, packetId);
 						result.put(type, processTable(type, element));
 					} catch (IllegalArgumentException ex) {
