@@ -48,7 +48,7 @@ public class WikiPacketReader {
 	public static final String STANDARD_URL = "https://www.wiki.vg/Protocol";
 	
 	// Stored packet information
-	private Map<PacketType, WikiPacketInfo> packets;
+	private final Map<PacketType, WikiPacketInfo> packets;
 	
 	public WikiPacketReader() throws IOException {
 		this(STANDARD_URL);

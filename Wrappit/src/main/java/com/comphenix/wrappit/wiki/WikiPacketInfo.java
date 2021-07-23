@@ -27,8 +27,8 @@ import java.util.List;
 import com.comphenix.protocol.PacketType;
 
 public class WikiPacketInfo {
-	private PacketType type;
-	private List<WikiPacketField> packetFields;
+	private final PacketType type;
+	private final List<WikiPacketField> packetFields;
 	
 	public WikiPacketInfo(PacketType type, List<WikiPacketField> packetFields) {
 		this.type = type;

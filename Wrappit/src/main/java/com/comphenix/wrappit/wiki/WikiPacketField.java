@@ -23,9 +23,9 @@
 package com.comphenix.wrappit.wiki;
 
 public class WikiPacketField {
-	private String fieldName;
-	private String fieldType;
-	private String notes;
+	private final String fieldName;
+	private final String fieldType;
+	private final String notes;
 	
 	public WikiPacketField(String fieldName, String fieldType, String notes) {
 		this.fieldName = fieldName;

@@ -107,9 +107,9 @@ public class WrapperGenerator {
 			return null;
 		}
 
-		private Class<?> inputType;
-		private String outputType;
-		private String name;
+		private final Class<?> inputType;
+		private final String outputType;
+		private final String name;
 
 		Modifiers(Class<?> inputType, String outputType, String name) {
 			this.inputType = inputType;
@@ -131,18 +131,18 @@ public class WrapperGenerator {
 
 		public boolean isWrapper() {
 			switch (this) {
-			case BLOCK:
-			case BLOCK_POSITION:
-			case CHAT_BASE_COMPONENT:
-			case CHUNK_COORD_INT_PAIR:
-			case COMPONENT_ARRAY:
-			case DATA_WATCHER_MODIFIER:
-			case GAME_PROFILE:
-			case POSITION_LIST:
-			case SERVER_PING:
-				return true;
-			default:
-				return false;
+				case BLOCK:
+				case BLOCK_POSITION:
+				case CHAT_BASE_COMPONENT:
+				case CHUNK_COORD_INT_PAIR:
+				case COMPONENT_ARRAY:
+				case DATA_WATCHER_MODIFIER:
+				case GAME_PROFILE:
+				case POSITION_LIST:
+				case SERVER_PING:
+					return true;
+				default:
+					return false;
 			}
 		}
 	}
@@ -170,10 +170,10 @@ public class WrapperGenerator {
 		" */"
 	};
 
-	private CodePacketReader codeReader;
+	private final CodePacketReader codeReader;
 
-	private Set<String> ignoreArray = new HashSet<String>(Arrays.asList("array", "of"));
-	private WikiPacketReader wikiReader;
+	private final Set<String> ignoreArray = new HashSet<String>(Arrays.asList("array", "of"));
+	private final WikiPacketReader wikiReader;
 
 	public WrapperGenerator(CodePacketReader codeReader, WikiPacketReader wikiReader) {
 		this.codeReader = codeReader;

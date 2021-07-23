@@ -31,8 +31,8 @@ import org.objectweb.asm.Opcodes;
 
 public class FieldEnumerator extends MethodVisitor {
 	boolean newLine = false;
-	private Class<?> packetClass;
-	private String className;
+	private final Class<?> packetClass;
+	private final String className;
 	
 	protected List<Field> output;
 	
