@@ -19,5 +19,9 @@ target/
 *.launch
 .cproject
 .buildpath
+
+#################
+## IntelliJ
+#################
 .idea/
 *.iml
