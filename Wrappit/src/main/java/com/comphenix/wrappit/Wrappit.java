@@ -24,6 +24,7 @@ package com.comphenix.wrappit;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.utility.Constants;
@@ -110,7 +111,7 @@ public class Wrappit {
 				String className = "Wrapper" + getCamelCase(type.getProtocol()) + getCamelCase(type.getSender()) + getCamelCase(type.name());
 				File file = new File(folder, className + ".java");
 				file.createNewFile();
-				IOUtil.writeLines(file, Arrays.asList(generator.generateClass(type)));
+				IOUtil.writeLines(file, Collections.singletonList( generator.generateClass( type ) ) );
 			} catch (Throwable ex) {
 				System.err.println("Failed to generate wrapper for " + type.name());
 				ex.printStackTrace();

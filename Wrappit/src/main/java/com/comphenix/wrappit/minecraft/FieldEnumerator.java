@@ -34,7 +34,7 @@ public class FieldEnumerator extends MethodVisitor {
 	private final Class<?> packetClass;
 	private final String className;
 	
-	protected List<Field> output;
+	protected final List<Field> output;
 	
 	public FieldEnumerator(Class<?> packetClass, List<Field> output) {
 		super(Opcodes.ASM4);

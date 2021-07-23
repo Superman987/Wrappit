@@ -33,7 +33,7 @@ import java.io.IOException;
  * @author Kristian
  */
 public class IndentBuilder implements Appendable {
-	public static String NEWLN = System.getProperty("line.separator");
+	public static final String NEWLN = System.getProperty("line.separator");
 	
 	private final Appendable delegate;
 	private final int indentLevel;

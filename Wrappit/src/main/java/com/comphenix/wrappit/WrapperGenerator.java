@@ -130,20 +130,10 @@ public class WrapperGenerator {
 		}
 
 		public boolean isWrapper() {
-			switch (this) {
-				case BLOCK:
-				case BLOCK_POSITION:
-				case CHAT_BASE_COMPONENT:
-				case CHUNK_COORD_INT_PAIR:
-				case COMPONENT_ARRAY:
-				case DATA_WATCHER_MODIFIER:
-				case GAME_PROFILE:
-				case POSITION_LIST:
-				case SERVER_PING:
-					return true;
-				default:
-					return false;
-			}
+			return switch ( this ) {
+				case BLOCK, BLOCK_POSITION, CHAT_BASE_COMPONENT, CHUNK_COORD_INT_PAIR, COMPONENT_ARRAY, DATA_WATCHER_MODIFIER, GAME_PROFILE, POSITION_LIST, SERVER_PING -> true;
+				default -> false;
+			};
 		}
 	}
 
@@ -172,7 +162,7 @@ public class WrapperGenerator {
 
 	private final CodePacketReader codeReader;
 
-	private final Set<String> ignoreArray = new HashSet<String>(Arrays.asList("array", "of"));
+	private final Set<String> ignoreArray = new HashSet <>( Arrays.asList( "array", "of" ) );
 	private final WikiPacketReader wikiReader;
 
 	public WrapperGenerator(CodePacketReader codeReader, WikiPacketReader wikiReader) {
@@ -195,7 +185,7 @@ public class WrapperGenerator {
 		int fieldIndex = 0;
 
 		for (String header : HEADER) {
-			builder.append(header + NEWLN);
+			builder.append( header ).append( NEWLN );
 		}
 
 		builder.append("package com.comphenix.packetwrapper;").append(NEWLN).append(NEWLN);

@@ -43,10 +43,10 @@ public class CaseFormating {
 		StringBuilder output = new StringBuilder();
 		
 		// Capitalize all the words
-		for (int i = 0; i < words.length; i++) {
-			output.append(words[i].substring(0, 1).toUpperCase()); 
-			output.append(words[i].substring(1).toLowerCase());
-			output.append(delimiter);
+		for ( String word : words ) {
+			output.append( word.substring( 0, 1 ).toUpperCase() );
+			output.append( word.substring( 1 ).toLowerCase() );
+			output.append( delimiter );
 		}
 		return output.toString();
 	}

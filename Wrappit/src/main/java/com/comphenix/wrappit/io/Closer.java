@@ -64,7 +64,7 @@ public class Closer implements Closeable
 			try
 			{
 				closeable.close();
-			} catch (Throwable ex) { }
+			} catch (Throwable ignored) { }
 		}
 
 		list.clear();

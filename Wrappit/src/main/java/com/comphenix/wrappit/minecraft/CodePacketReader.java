@@ -104,7 +104,7 @@ public class CodePacketReader {
 						@Override
 						protected boolean processField(Field field) {
 							return isValidField(field);
-						};
+						}
 					};
 				} else {
 					return null;

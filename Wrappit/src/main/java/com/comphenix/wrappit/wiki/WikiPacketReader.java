@@ -63,7 +63,7 @@ public class WikiPacketReader {
 	}
 	
 	private Map<PacketType, WikiPacketInfo> loadFromDocument(Document doc) {
-		Map<PacketType, WikiPacketInfo> result = new HashMap<PacketType, WikiPacketInfo>();
+		Map<PacketType, WikiPacketInfo> result = new HashMap <>();
 		Element bodyContent = doc.getElementById("mw-content-text");
 
 		Element parserOutput = bodyContent.getElementsByClass("mw-parser-output").get(0);
@@ -122,7 +122,7 @@ public class WikiPacketReader {
 	}
 	
 	private WikiPacketInfo processTable(PacketType type, Element table) {
-		List<WikiPacketField> fields = new ArrayList<WikiPacketField>();
+		List<WikiPacketField> fields = new ArrayList <>();
 		Elements rows = table.select("tr");
 		
 		// Skip the first row

@@ -135,7 +135,7 @@ public class WrapperTest {
 							failures.add(clazz.getName() + " :: " + method.getName() + " :: " + ex.getCause());
 						}
 					}
-				} catch (NoSuchMethodException ex) {
+				} catch (NoSuchMethodException ignored) {
 				} catch (Throwable ex) {
 					System.err.println("Failed to test " + name + ":");
 					ex.printStackTrace();
