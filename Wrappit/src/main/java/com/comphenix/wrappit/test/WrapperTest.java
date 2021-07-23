@@ -162,7 +162,7 @@ public class WrapperTest {
 					} else if (type.isDynamic()) {
 						System.out.println("PacketType does not exist for packet class: " + type.getPacketClass().getSimpleName());
 					} else {
-						System.err.println("Wrapper does not exist for packet: " + type.toString());
+						System.err.println("Wrapper does not exist for packet: " + type );
 						failures.add(className);
 					}
 				}
