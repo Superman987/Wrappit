@@ -64,7 +64,7 @@ public class IOUtil
 
 		List<String> lines = new ArrayList<>();
 
-		String line = null;
+		String line;
 		while ((line = br.readLine()) != null)
 			lines.add(line);
 
