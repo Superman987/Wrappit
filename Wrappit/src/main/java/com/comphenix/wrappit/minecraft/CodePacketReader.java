@@ -27,6 +27,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+import net.minecraft.server.v1_16_R3.PacketPlayInFlying;
+import net.minecraft.server.v1_16_R3.PacketPlayOutBoss;
+import net.minecraft.server.v1_16_R3.PacketPlayOutTabComplete;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -37,7 +40,8 @@ import com.comphenix.protocol.utility.Constants;
 
 public class CodePacketReader {
 	// Write packet method signature
-	private static final String WRITE_PACKET_SIGNATURE = "(Lnet/minecraft/server/" + Constants.PACKAGE_VERSION + "/PacketDataSerializer;)V";
+	// private static final String WRITE_PACKET_SIGNATURE = "(Lnet/minecraft/server/" + Constants.PACKAGE_VERSION + "/PacketDataSerializer;)V";
+	private static final String WRITE_PACKET_SIGNATURE = "(Lnet/minecraft/server/v1_16_R3/PacketDataSerializer;)V";
 	private static final String WRITE_PACKET_NAME = "b";
 	
 	/**
@@ -74,10 +78,12 @@ public class CodePacketReader {
 	}
 
 	private List<Field> readNetworkOrder(final Class<?> packetClass) throws IOException {
+		System.out.println("loading " + packetClass.getCanonicalName());
+
 		final ClassReader reader = new ClassReader(packetClass.getCanonicalName());
 		final List<Field> result = new ArrayList<>();
 
-		reader.accept(new ClassVisitor(Opcodes.ASM4) {
+		reader.accept(new ClassVisitor(Opcodes.ASM5) {
 			@Override
 			public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 				final String writePacketName = name;

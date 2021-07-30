@@ -38,6 +38,8 @@ import com.google.common.base.CaseFormat;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 
 public class Wrappit {
 	private static File wikiPage = null;
@@ -45,7 +47,7 @@ public class Wrappit {
 	private static boolean test = false;
 
 	public static void main(String[] args) {
-		generate(new String[] { "--wikiPage", "C:/Users/Dan/Documents/Development/utils/protocol.html" });
+		generate(new String[] { "--wikiPage", "C:/Users/Niklas/Desktop/protocol.html" });
 		// generate(args);
 		// test();
 	}
@@ -93,8 +95,8 @@ public class Wrappit {
 		MinecraftVersion.setCurrentVersion(Constants.CURRENT_VERSION);
 
 		CodePacketReader codeReader = new CodePacketReader();
-		// WikiPacketReader wikiReader = new WikiPacketReader(wikiPage);
-		WikiPacketReader wikiReader = new WikiPacketReader();
+		WikiPacketReader wikiReader = new WikiPacketReader(wikiPage);
+		// WikiPacketReader wikiReader = new WikiPacketReader();
 		WrapperGenerator generator = new WrapperGenerator(codeReader, wikiReader);
 
 		File folder = new File("Packets");
@@ -107,14 +109,15 @@ public class Wrappit {
 
 		for (PacketType type : PacketType.values()) {
 			try {
-				System.out.println("Generating wrapper for " + type.name());
 				String className = "Wrapper" + getCamelCase(type.getProtocol()) + getCamelCase(type.getSender()) + getCamelCase(type.name());
+				System.out.println("Generating wrapper for " + type.name() + " " + className + " for " + type);
 				File file = new File(folder, className + ".java");
 				file.createNewFile();
 				IOUtil.writeLines(file, Collections.singletonList( generator.generateClass( type ) ) );
 			} catch (Throwable ex) {
-				System.err.println("Failed to generate wrapper for " + type.name());
-				ex.printStackTrace();
+				System.err.println("Failed to generate wrapper for " + type.name() + " - deprecated: " + type.isDeprecated());
+				if ( !type.isDeprecated() )
+					ex.printStackTrace();
 			}
 		}
 

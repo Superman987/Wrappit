@@ -22,26 +22,26 @@
  */
 package com.comphenix.wrappit.wiki;
 
-public class WikiPacketField {
-	private final String fieldName;
-	private final String fieldType;
-	private final String notes;
-	
-	public WikiPacketField(String fieldName, String fieldType, String notes) {
-		this.fieldName = fieldName;
-		this.fieldType = fieldType;
-		this.notes = notes;
-	}
-	
+public record WikiPacketField(String fieldName, String fieldType, String notes) {
+
 	public String getFieldName() {
 		return fieldName;
 	}
-	
+
 	public String getFieldType() {
 		return fieldType;
 	}
-	
+
 	public String getNotes() {
 		return notes != null ? notes : "";
+	}
+
+	@Override
+	public String toString() {
+		return "WikiPacketField{" +
+				"fieldName='" + fieldName + '\'' +
+				", fieldType='" + fieldType + '\'' +
+				", notes='" + notes + '\'' +
+				'}';
 	}
 }

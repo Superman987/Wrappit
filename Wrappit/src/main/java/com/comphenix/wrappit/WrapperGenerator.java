@@ -22,19 +22,6 @@
  */
 package com.comphenix.wrappit;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.security.PublicKey;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import net.minecraft.server.v1_15_R1.*;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.wrappit.minecraft.CodePacketInfo;
 import com.comphenix.wrappit.minecraft.CodePacketReader;
@@ -44,46 +31,82 @@ import com.comphenix.wrappit.wiki.WikiPacketField;
 import com.comphenix.wrappit.wiki.WikiPacketInfo;
 import com.comphenix.wrappit.wiki.WikiPacketReader;
 import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.tree.RootCommandNode;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.WorldType;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.security.PublicKey;
+import java.util.*;
 
 
 public class WrapperGenerator {
 	public enum Modifiers {
-		BLOCK(Block.class,                            "Material",               "getBlocks()"),
-		BLOCK_DATA(IBlockData.class,                  "WrappedBlockData",       "getBlockData()"),
-		BLOCK_POSITION(BlockPosition.class,           "BlockPosition",          "getBlockPositionModifier()"),
-		BOOLEANS(boolean.class,                       "boolean",                "getBooleans()"),
-		BYTE_ARRAYS(byte[].class,                     "byte[]",                 "getByteArrays()"),
-		BYTES(byte.class,                             "byte",                   "getBytes()"),
-		CHAT_BASE_COMPONENT(IChatBaseComponent.class, "WrappedChatComponent",   "getChatComponents()"),
-		CHUNK_COORD_INT_PAIR(ChunkCoordIntPair.class, "ChunkCoordIntPair",      "getChunkCoordIntPairs()"),
-		COMPONENT_ARRAY(IChatBaseComponent[].class,   "WrappedChatComponent[]", "getChatComponentArrays()"),
-		DATA_WATCHER_MODIFIER(DataWatcher.class,      "WrappedDataWatcher",     "getDataWatcherModifier()"),
-		DIFFICULTIES(EnumDifficulty.class,            "Difficulty",             "getDifficulties()"),
-		DOUBLES(double.class,                         "double",                 "getDoubles()"),
-		ENUMS(Enum.class,                             "Enum<?>",                "getSpecificModifier(Enum.class)"),
-		ENUM_HAND(EnumHand.class,                     "Hand",                   "getHands()"),
-		FLOATS(float.class,                           "float",                  "getFloat()"),
-		GAME_PROFILE(GameProfile.class,               "WrappedGameProfile",     "getGameProfiles()"),
-		INTEGER_ARRAYS(int[].class,                   "int[]",                  "getIntegerArrays()"),
-		INTEGERS(int.class,                           "int",                    "getIntegers()"),
-		ITEM_LIST_MODIFIER(List.class,                "List<ItemStack>",        "getItemListModifier()"),
-		ITEM_MODIFIER(ItemStack.class,                "ItemStack",              "getItemModifier()"),
-		LONGS(long.class,                             "long",                   "getLongs()"),
-		MAP(Map.class,                                "Map<?,?>",               "getSpecificModifier(Map.class)"),
-		MINECRAFT_KEY(MinecraftKey.class,             "MinecraftKey",           "getMinecraftKeys()"),
-		NBT_MODIFIER(NBTTagCompound.class,            "NbtBase<?>",             "getNbtModifier()"),
-		POSITION_LIST(List.class,                     "List<BlockPosition>",    "getBlockPositionCollectionModifier()"),
-		SET(Set.class,                                "Set<?>",                 "getSpecificModifier(Set.class)"),
-		PUBLIC_KEY_MODIFIER(PublicKey.class,          "PublicKey",              "getSpecificModifier(PublicKey.class)"),
-		SERVER_PING(ServerPing.class,                 "WrappedServerPing",      "getServerPings()"),
-		SHORTS(short.class,                           "short",                  "getShorts()"),
-		SOUND_EFFECT(SoundEffect.class,               "Sound",                  "getSoundEffects()"),
-		SOUND_CATEGORY(SoundCategory.class,           "SoundCategory",          "getSoundCategories()"),
-		STRING_ARRAYS(String[].class,                 "String[]",               "getStringArrays()"),
-		STRINGS(String.class,                         "String",                 "getStrings()"),
-		UUID(UUID.class,                              "UUID",                   "getUUIDs"),
-		VEC3D(Vec3D.class,                            "Vector",                 "getVectors()"),
-		WORLD_TYPE_MODIFIER(WorldType.class,          "WorldType",              "getWorldTypeModifier()");
+		ATTRIBUTE_COLLECTION_MODIFIER( List.class, "List<WrappedAttribute>", "getAttributeCollectionModifier()" ),
+		BASE_COMPONENT_ARRAY( BaseComponent[].class, "BaseComponent[]", "getSpecificModifier(BaseComponent[].class)" ),
+		BLOCK( Block.class, "Material", "getBlocks()" ),
+		BLOCK_DATA( IBlockData.class, "WrappedBlockData", "getBlockData()" ),
+		BLOCK_DATA_ARRAY( IBlockData[].class, "WrappedBlockData[]", "getBlockDataArrays()" ),
+		BLOCK_POSITION( BlockPosition.class, "BlockPosition", "getBlockPositionModifier()" ),
+		BLOCK_POSITION_COLLECTION_MODIFIER( List.class, "List<BlockPosition>", "getBlockPositionCollectionModifier()" ),
+		BOOLEANS( boolean.class, "boolean", "getBooleans()" ),
+		BYTE_ARRAYS( byte[].class, "byte[]", "getByteArrays()" ),
+		BYTES( byte.class, "byte", "getBytes()" ),
+		CHUNK_COORD_INT_PAIR( ChunkCoordIntPair.class, "ChunkCoordIntPair", "getChunkCoordIntPairs()" ),
+		COLLECTION( Collection.class, "Collection", "getSpecificModifier(Collection.class)" ),
+		COMPONENT( IChatBaseComponent.class, "WrappedChatComponent", "getChatComponents()" ),
+		COMPONENT_ARRAY( IChatBaseComponent[].class, "WrappedChatComponent[]", "getChatComponentArrays()" ),
+		DATA_WATCHER_MODIFIER( DataWatcher.class, "WrappedDataWatcher", "getDataWatcherModifier()" ),
+		DIFFICULTIES( EnumDifficulty.class, "Difficulty", "getDifficulties()" ),
+		DIMENSION( IRegistryCustom.Dimension.class, "int", "getDimensions()" ),
+		DOUBLES( double.class, "double", "getDoubles()" ),
+		ENTITY_TYPE_MODIFIER( EntityTypes.class, "EntityType", "getEntityTypeModifier()" ),
+		ENUMS( Enum.class, "Enum<?>", "getSpecificModifier(Enum.class)" ),
+		ENUM_HAND( EnumHand.class, "Hand", "getHands()" ),
+		FLOATS( float.class, "float", "getFloat()" ),
+		GAME_PROFILE( GameProfile.class, "WrappedGameProfile", "getGameProfiles()" ),
+		GAME_STATE_CHANGE( PacketPlayOutGameStateChange.a.class, "int", "getGameStateIDs()" ),
+		INTEGER_ARRAYS( int[].class, "int[]", "getIntegerArrays()" ),
+		INTEGERS( int.class, "int", "getIntegers()" ),
+		ITEM_LIST_MODIFIER( List.class, "List<ItemStack>", "getItemListModifier()" ),
+		ITEM_ARRAY_MODIFIER( ItemStack[].class, "ItemStack[]", "getItemArrayModifier()" ),
+		ITEM_MODIFIER( ItemStack.class, "ItemStack", "getItemModifier()" ),
+		LONGS( long.class, "long", "getLongs()" ),
+		MAP( Map.class, "Map<?,?>", "getSpecificModifier(Map.class)" ),
+		MERCHANT_RECIPE_LIST( MerchantRecipeList.class, "List<MerchantRecipe>", "getMerchantRecipeLists()" ),
+		MINECRAFT_KEY( MinecraftKey.class, "MinecraftKey", "getMinecraftKeys()" ),
+		MOB_EFFECT_TYPES( MobEffectList.class, "PotionEffectType", "getEffectTypes()" ),
+		MOVING_OBJECT_POSITION_BLOCK( MovingObjectPositionBlock.class, "MovingObjectPositionBlock", "getMovingBlockPositions()" ),
+		MULTI_BLOCK_CHANGE_INFO_ARRAY( SectionPosition[].class, "MultiBlockChangeInfo[]", "getMultiBlockChangeInfoArrays()" ),
+		NBT_LIST_MODIFIER( List.class, "List<NbtBase<?>>", "getListNbtModifier()" ),
+		NBT_MODIFIER( NBTTagCompound.class, "NbtBase<?>", "getNbtModifier()" ),
+		PARTICLE_PARAM( ParticleParam.class, "WrappedParticle", "getNewParticles()" ),
+		PLAYER_INFO_DATA_LIST( List.class, "List<PlayerInfoData>", "getPlayerInfoDataLists()" ),
+		POSITION_COLLECTION_MODIFIER( List.class, "List<ChunkPosition>", "getPositionCollectionModifier()" ),
+		POSITION_LIST( List.class, "List<BlockPosition>", "getBlockPositionCollectionModifier()" ),
+		SET( Set.class, "Set<?>", "getSpecificModifier(Set.class)" ),
+		PUBLIC_KEY_MODIFIER( PublicKey.class, "PublicKey", "getSpecificModifier(PublicKey.class)" ),
+		RESOURCE_KEY( ResourceKey.class, "World", "getWorldKeys()" ),
+		ROOT_COMMAND_NODE( RootCommandNode.class, "RootCommandNode<?>", "getSpecificModifier(RootCommandNode.class)" ), // should be safe to use
+		SERVER_PING( ServerPing.class, "WrappedServerPing", "getServerPings()" ),
+		SHORT_ARRAYS( short[].class, "short[]", "getShortArrays()" ),
+		SHORTS( short.class, "short", "getShorts()" ),
+		SOUND_EFFECT( SoundEffect.class, "Sound", "getSoundEffects()" ),
+		SOUND_CATEGORY( SoundCategory.class, "SoundCategory", "getSoundCategories()" ),
+		SUGGESTIONS( Suggestions.class, "Suggestions", "getSpecificModifier(Suggestions.class)" ), // should be safe to use
+		SECTION_POSITION( SectionPosition.class, "BlockPosition", "getSectionPositions()" ),
+		STATISTIC_MAP( Map.class, "Map<WrappedStatistic, Integer>", "getStatisticMaps()" ),
+		STRING_ARRAYS( String[].class, "String[]", "getStringArrays()" ),
+		STRINGS( String.class, "String", "getStrings()" ),
+		TITLE_ACTION( PacketPlayOutTitle.EnumTitleAction.class, "EnumWrappers.TitleAction", "getTitleActions()" ),
+		UUID( UUID.class, "UUID", "getUUIDs" ),
+		VEC3D( Vec3D.class, "Vector", "getVectors()" ),
+		WATCHABLE_COLLECTION_MODIFIER( List.class, "List<WrappedWatchableObject>", "getWatchableCollectionModifier()" ),
+		WORLD_BORDER_ACTION( PacketPlayOutWorldBorder.EnumWorldBorderAction.class, "EnumWrappers.WorldBorderAction", "getWorldBorderActions()" ),
+		WORLD_TYPE_MODIFIER( WorldType.class, "WorldType", "getWorldTypeModifier()" );
 
 		private static Map<Class<?>, Modifiers> inputLookup;
 
@@ -131,7 +154,7 @@ public class WrapperGenerator {
 
 		public boolean isWrapper() {
 			return switch ( this ) {
-				case BLOCK, BLOCK_POSITION, CHAT_BASE_COMPONENT, CHUNK_COORD_INT_PAIR, COMPONENT_ARRAY, DATA_WATCHER_MODIFIER, GAME_PROFILE, POSITION_LIST, SERVER_PING -> true;
+				case BLOCK, BLOCK_POSITION, COMPONENT, CHUNK_COORD_INT_PAIR, COMPONENT_ARRAY, DATA_WATCHER_MODIFIER, GAME_PROFILE, POSITION_LIST, SERVER_PING -> true;
 				default -> false;
 			};
 		}
@@ -140,7 +163,7 @@ public class WrapperGenerator {
 	private static final String NEWLN = System.getProperty("line.separator");
 
 	private static final String[] HEADER = {
-		"/**",
+		"/*",
 		" * This file is part of PacketWrapper.",
 		" * Copyright (C) 2012-2015 Kristian S. Strangeland",
 		" * Copyright (C) 2015 dmulloy2",
@@ -214,7 +237,7 @@ public class WrapperGenerator {
 
 				if (modifier == null) {
 					indent.appendLine("// Cannot find type for " + codeField.getName());
-					System.err.println("Cannot find type " + codeField.getType() + " for field " + codeField.getName());
+					System.err.println("Cannot find type " + codeField.getType() + " for field " + codeField.getName() + " in " + type.toString());
 					continue;
 				}
 
@@ -222,7 +245,7 @@ public class WrapperGenerator {
 					writeGetMethod(indent, fieldIndex, modifier, codeInfo, field);
 				} catch (Throwable ex) {
 					indent.appendLine("// Cannot generate getter " + codeField.getName());
-					System.err.println("Failed to generate getter " + codeField.getName());
+					System.err.println("Failed to generate getter " + codeField.getName() + " in " + type.toString());
 					ex.printStackTrace();
 				}
 
@@ -230,7 +253,7 @@ public class WrapperGenerator {
 					writeSetMethod(indent, fieldIndex, modifier, codeInfo, field);
 				} catch (Throwable ex) {
 					indent.appendLine("// Cannot generate setter " + codeField.getName());
-					System.err.println("Failed to generate setter " + codeField.getName());
+					System.err.println("Failed to generate setter " + codeField.getName() + " in " + type.toString());
 					ex.printStackTrace();
 				}
 			} else {
@@ -260,9 +283,14 @@ public class WrapperGenerator {
 				.replace("slot", "ItemStack")
 				.replace("metadata", "WrappedDataWatcher")
 				.replace("unsigned", "")
+				.replace("optional", "")
+				.replace( "varint enum", "enum" )
 				.replace("varint", "int")
 				.replace("bool", "boolean")
+				.replace("Boolean", "boolean")
 				.replace("uuid", "UUID")
+				.replace( "inputitem1", "ItemStack" )
+				.replace( "inputitem2", "ItemStack" )
 				.replace(" ", "");
 
 		// Detect arrays
@@ -312,6 +340,12 @@ public class WrapperGenerator {
 
 	private void writeGetMethod(IndentBuilder indent, int fieldIndex, Modifiers modifier, CodePacketInfo codeInfo, WikiPacketField field)
 			throws IOException {
+
+		if ( field.getFieldName() == null ) {
+			System.err.println( "Undocumented field in wiki -> packet " + codeInfo.getType() + " - info required for " + modifier.getInputType() + " (field: " + fieldIndex + ")" );
+			return;
+		}
+
 		String name = getFieldName(field);
 		String outputType = getFieldType(field);
 		String casting = "";
@@ -380,6 +414,11 @@ public class WrapperGenerator {
 
 	private void writeSetMethod(IndentBuilder indent, int fieldIndex, Modifiers modifier, CodePacketInfo codeInfo, WikiPacketField field)
 			throws IOException {
+		if ( field.getFieldName() == null ) {
+			System.err.println( "Undocumented field in wiki -> packet " + codeInfo.getType() + " - info required for " + modifier.getInputType() + " (field: " + fieldIndex + ")" );
+			return;
+		}
+
 		String name = getFieldName(field);
 		String inputType = getFieldType(field);
 		String casting = "";

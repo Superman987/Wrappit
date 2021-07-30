@@ -24,11 +24,7 @@ package com.comphenix.wrappit.wiki;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -59,7 +55,7 @@ public class WikiPacketReader {
 	}
 	
 	public WikiPacketReader(File file) throws IOException {
-		packets = loadFromDocument(Jsoup.parse(file, null));
+		packets = loadFromDocument(Jsoup.parse(file, "UTF-8"));
 	}
 	
 	private Map<PacketType, WikiPacketInfo> loadFromDocument(Document doc) {
@@ -74,15 +70,12 @@ public class WikiPacketReader {
 		
 		for (Element element : parserOutput.children()) {
 			String tag = element.tagName();
-			System.out.println(element.nodeName());
-			
+
 			// Protocol candidate
 			if (tag.equals("h2")) {
 				try {
 					String text = getEnumText(element.select(".mw-headline").first());
-					System.out.println("h2 text=" + text);
 					protocol = Protocol.valueOf(text);
-					
 				} catch (IllegalArgumentException e) {
 					// We are in a section that is not a protocol
 					protocol = null;
@@ -90,7 +83,7 @@ public class WikiPacketReader {
 			// Sender candidates
 			} else if (tag.equals("h3")) {
 				String text = getEnumText(element.select(".mw-headline").first());
-				
+
 				if ("SERVERBOUND".equals(text)) {
 					sender = Sender.CLIENT;
 				} else if ("CLIENTBOUND".equals(text)) {
@@ -128,6 +121,10 @@ public class WikiPacketReader {
 		// Skip the first row
 		for (int i = 1; i < rows.size(); i++) {
 			String[] data = getCells(rows.get(i), i == 1 ? 3 : 0, 3);
+
+			// check if this was a valid table
+			if ( data[0] == null && data[1] == null && data[2] == null ) continue;
+
 			fields.add(new WikiPacketField(data[0], data[1], data[2]));
 		}
 		// Save this
